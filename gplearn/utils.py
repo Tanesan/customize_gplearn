@@ -74,3 +74,24 @@ def _partition_estimators(n_estimators, n_jobs):
     starts = np.cumsum(n_estimators_per_job)
 
     return n_jobs, n_estimators_per_job.tolist(), [0] + starts.tolist()
+
+
+def tupple_isint(a, b):
+    """Check that the two arrays have int or float type.
+
+    Parameters
+    ----------
+    a : array_like
+        The first input array.
+
+    b : array_like
+        The second input array.
+
+    Returns
+    ---------
+    out : bool
+    """
+    if type(a) == type(b):
+        if type(a) == int:
+            return True
+    return False

@@ -15,7 +15,7 @@ import numpy as np
 from sklearn.utils.random import sample_without_replacement
 
 from .functions import _Function
-from .utils import check_random_state
+from .utils import check_random_state, tupple_isint
 
 
 class _Program(object):
@@ -53,8 +53,9 @@ class _Program(object):
     n_features : int
         The number of features in `X`.
 
-    const_range : tuple of two floats
+    const_range : tuple of two ints or floats
         The range of constants to include in the formulas.
+        If int tuple, this software search only int.
 
     metric : _Fitness object
         The raw fitness metric.
@@ -206,11 +207,14 @@ class _Program(object):
                 else:
                     terminal = random_state.randint(self.n_features)
                 if terminal == self.n_features:
-                    terminal = random_state.uniform(*self.const_range)
-                    if self.const_range is None:
-                        # We should never get here
-                        raise ValueError('A constant was produced with '
-                                         'const_range=None.')
+                    if tupple_isint(*self.const_range):
+                        terminal = random_state.randint(*self.const_range)
+                    else:
+                        terminal = random_state.uniform(*self.const_range)
+                        if self.const_range is None:
+                            # We should never get here
+                            raise ValueError('A constant was produced with '
+                                            'const_range=None.')
                 program.append(terminal)
                 terminal_stack[-1] -= 1
                 while terminal_stack[-1] == 0:
@@ -638,7 +642,7 @@ class _Program(object):
         program = copy(self.program)
 
         # Get the nodes to modify
-        mutate = np.where(random_state.uniform(size=len(program)) <
+        mutate = np.where(random_state.randint(size=len(program)) <
                           self.p_point_replace)[0]
 
         for node in mutate:
@@ -656,7 +660,7 @@ class _Program(object):
                 else:
                     terminal = random_state.randint(self.n_features)
                 if terminal == self.n_features:
-                    terminal = random_state.uniform(*self.const_range)
+                    terminal = random_state.randint(*self.const_range)
                     if self.const_range is None:
                         # We should never get here
                         raise ValueError('A constant was produced with '
