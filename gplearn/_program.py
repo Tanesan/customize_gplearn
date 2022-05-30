@@ -208,7 +208,7 @@ class _Program(object):
                     terminal = random_state.randint(self.n_features)
                 if terminal == self.n_features:
                     if tupple_isint(*self.const_range):
-                        terminal = random_state.randint(*self.const_range)
+                        terminal = float(random_state.randint(*self.const_range))
                     else:
                         terminal = random_state.uniform(*self.const_range)
                         if self.const_range is None:
@@ -378,7 +378,7 @@ class _Program(object):
             while len(apply_stack[-1]) == apply_stack[-1][0].arity + 1:
                 # Apply functions that have sufficient arguments
                 function = apply_stack[-1][0]
-                terminals = [np.repeat(t, X.shape[0]) if isinstance(t, float)
+                terminals = [np.repeat(t, X.shape[0]) if isinstance(u, float)
                              else X[:, t] if isinstance(t, int)
                              else t for t in apply_stack[-1][1:]]
                 intermediate_result = function(*terminals)
@@ -660,11 +660,14 @@ class _Program(object):
                 else:
                     terminal = random_state.randint(self.n_features)
                 if terminal == self.n_features:
-                    terminal = random_state.randint(*self.const_range)
-                    if self.const_range is None:
-                        # We should never get here
-                        raise ValueError('A constant was produced with '
-                                         'const_range=None.')
+                    if tupple_isint(*self.const_range):
+                        terminal = float(random_state.randint(*self.const_range))
+                    else:
+                        terminal = random_state.uniform(*self.const_range)
+                        if self.const_range is None:
+                            # We should never get here
+                            raise ValueError('A constant was produced with '
+                                            'const_range=None.')
                 program[node] = terminal
 
         return program, list(mutate)
